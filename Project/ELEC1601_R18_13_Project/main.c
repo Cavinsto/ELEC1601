@@ -30,17 +30,16 @@ int main(int argc, char *argv[]){
 
     // Create a renderer (accelerated and in sync with the display refresh rate)
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 
     // Initialize support for loading PNG and JPEG images
     IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
     SDL_Texture * image_texture_01 = initialize_texture_from_file("TitleScreen_01.jpg", renderer);
-    SDL_Texture * image_texture_02 = initialize_texture_from_file("TitleScreen_02.jpg", renderer);
+    //SDL_Texture * image_texture_02 = initialize_texture_from_file("TitleScreen_02.jpg", renderer);
     int image_width, image_height;
 
     // Get texture width/height
     SDL_QueryTexture(image_texture_01, NULL, NULL, &image_width, &image_height);
-    SDL_QueryTexture(image_texture_02, NULL, NULL, &image_width, &image_height);
+    //SDL_QueryTexture(image_texture_02, NULL, NULL, &image_width, &image_height);
 
     // Define where on the "screen" we want to draw the texture
     SDL_Rect texture_destination;
@@ -75,7 +74,7 @@ int main(int argc, char *argv[]){
 
     // Release resources
     SDL_DestroyTexture(image_texture_01);
-    SDL_DestroyTexture(image_texture_02);
+    //SDL_DestroyTexture(image_texture_02);
     IMG_Quit();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
@@ -98,29 +97,29 @@ int main(int argc, char *argv[]){
     // Relative positions are used (OVERALL_WINDOW_WIDTH and OVERALL_WINDOW_HEIGHT)
     // But you can use absolute positions. 10 is used as the width, but you can change this.
 
-    // Maze 1 & 2
-    insertAndSetFirstWall(&head, 2,  220, 400, 10, 80);
-    insertAndSetFirstWall(&head, 2,  20, 400, 200, 10);
-    insertAndSetFirstWall(&head, 2,  20, 50, 10, 350);
-    insertAndSetFirstWall(&head, 2,  20, 50, 280, 10);
-    insertAndSetFirstWall(&head, 2,  300, 50, 10, 100);
-    insertAndSetFirstWall(&head, 2,  300, 150, 110, 10);
-    insertAndSetFirstWall(&head, 2,  400, 50, 10, 100);
-    insertAndSetFirstWall(&head, 2,  400, 50, 220, 10);
-    insertAndSetFirstWall(&head, 2,  620, 50, 10, 290);
-    insertAndSetFirstWall(&head, 2,  620, 340, 20, 10);
+    //Maze 3 & 4
+    insertAndSetFirstWall(&head, 2,  640-10-220, 400, 10, 80);
+    insertAndSetFirstWall(&head, 2,  640-200-20, 400, 200, 10);
+    insertAndSetFirstWall(&head, 2,  640-10-20, 50, 10, 350);
+    insertAndSetFirstWall(&head, 2,  640-280-20, 50, 280, 10);
+    insertAndSetFirstWall(&head, 2,  640-10-300, 50, 10, 100);
+    insertAndSetFirstWall(&head, 2,  640-110-300, 150, 110, 10);
+    insertAndSetFirstWall(&head, 2,  640-10-400, 50, 10, 100);
+    insertAndSetFirstWall(&head, 2,  640-400-220, 50, 220, 10);
+    insertAndSetFirstWall(&head, 2,  640-10-620, 50, 10, 290);
+    insertAndSetFirstWall(&head, 2,  640-620-20, 340, 20, 10);
 
-    insertAndSetFirstWall(&head, 1,  320, 300, 10, 180);
-    insertAndSetFirstWall(&head, 2,  120, 300, 200, 10);
-    insertAndSetFirstWall(&head, 2,  120, 150, 10, 150);
-    insertAndSetFirstWall(&head, 2,  120, 150, 80, 10);
-    insertAndSetFirstWall(&head, 2,  200, 150, 10, 100);
-    insertAndSetFirstWall(&head, 2,  200, 250, 310, 10);
-    insertAndSetFirstWall(&head, 2,  500, 150, 10, 100);
-    insertAndSetFirstWall(&head, 2,  500, 150, 10, 100);
-    insertAndSetFirstWall(&head, 2,  500, 150, 20, 10);
-    insertAndSetFirstWall(&head, 2,  520, 150, 10, 290);
-    insertAndSetFirstWall(&head, 2,  520, 440, 120, 10);
+
+    insertAndSetFirstWall(&head, 1,  640-10-320, 300, 10, 180);
+    insertAndSetFirstWall(&head, 2,  640-200-120, 300, 200, 10);
+    insertAndSetFirstWall(&head, 2,  640-10-120, 150, 10, 150);
+    insertAndSetFirstWall(&head, 2,  640-80-120, 150, 80, 10);
+    insertAndSetFirstWall(&head, 2,  640-10-200, 150, 10, 100);
+    insertAndSetFirstWall(&head, 2,  640-310-200, 250, 310, 10);
+    insertAndSetFirstWall(&head, 2,  640-10-500, 150, 10, 100);
+    insertAndSetFirstWall(&head, 2,  640-20-500, 150, 20, 10);
+    insertAndSetFirstWall(&head, 2,  640-10-520, 150, 10, 290);
+    insertAndSetFirstWall(&head, 2,  640-120-520, 440, 120, 10);
 
 /*
 
@@ -338,11 +337,11 @@ int main(int argc, char *argv[]){
 
         //Check if robot reaches endpoint. and check sensor values
 
-        if (checkRobotReachedEnd(&robot, OVERALL_WINDOW_WIDTH, OVERALL_WINDOW_HEIGHT/2+100, 10, 100)){ //Default
+        //if (checkRobotReachedEnd(&robot, OVERALL_WINDOW_WIDTH, OVERALL_WINDOW_HEIGHT/2+100, 10, 100)){ //Default
         //if (checkRobotReachedEnd(&robot, 640, 340, 10, 100)){ //Maze 1
         //if (checkRobotReachedEnd(&robot, 220, 480, 100, 10)){ //Maze 2
         //if (checkRobotReachedEnd(&robot, 0, 340, 10, 100)){ // Maze 3
-        //if (checkRobotReachedEnd(&robot, 640-10-320, 480, 100, 10)){ //Maze 4
+        if (checkRobotReachedEnd(&robot, 640-10-320, 480, 100, 10)){ //Maze 4
         //if (checkRobotReachedEnd(&robot, 640, 20, 10, 60)){ //Maze 5
         //if (checkRobotReachedEnd(&robot, 120, 480, 100, 10)){ //Maze 6
         //if (checkRobotReachedEnd(&robot, 0, 20, 10, 60)){ //Maze 7

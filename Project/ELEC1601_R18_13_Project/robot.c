@@ -1,31 +1,21 @@
 #include "robot.h"
 
-// default
+//Maze 4
 void setup_robot(struct Robot *robot){
-    robot->x = OVERALL_WINDOW_WIDTH/2-50;
-    robot->y = OVERALL_WINDOW_HEIGHT-50;
-
-    // default
-    robot->true_x = OVERALL_WINDOW_WIDTH/2-50;
-    robot->true_y = OVERALL_WINDOW_HEIGHT-50;
-    robot->angle = 0;
-
-    // Shanghai F1
-    //robot->true_x = 35;
-    //robot->true_y = OVERALL_WINDOW_HEIGHT-55;
-    //robot->angle = 90;
-
+    robot->x = 0;
+    robot->y = 380;
+    robot->true_x = 0;
+    robot->true_y = 380;
     robot->width = ROBOT_WIDTH;
     robot->height = ROBOT_HEIGHT;
     robot->direction = 0;
+    robot->angle = 90;
     robot->currentSpeed = 0;
     robot->crashed = 0;
     robot->auto_mode = 0;
-    robot->counter = 0;
 
     printf("Press arrow keys to move manually, or enter to move automatically\n\n");
 }
-
 /*
 
 // default
@@ -404,7 +394,6 @@ int checkRobotSensorLeftAllWalls(struct Robot * robot, struct Wall_collection * 
 
 void robotUpdate(struct SDL_Renderer * renderer, struct Robot * robot){
     double xDir, yDir;
-    int xDirInt, yDirInt;
     int robotCentreX, robotCentreY, xTR, yTR, xTL, yTL, xBR, yBR, xBL, yBL;
     SDL_SetRenderDrawColor(renderer, 21, 76, 121, 255);
 
@@ -413,6 +402,7 @@ void robotUpdate(struct SDL_Renderer * renderer, struct Robot * robot){
     //Other Display options:
     // The actual square which the robot is tested against (not so nice visually with turns, but easier
     // to test overlap
+    int xDirInt, yDirInt;
     SDL_Rect rect = {robot->x, robot->y, robot->height, robot->width};
     SDL_SetRenderDrawColor(renderer, 21, 76, 121, 255);
     SDL_RenderDrawRect(renderer, &rect);
@@ -428,7 +418,9 @@ void robotUpdate(struct SDL_Renderer * renderer, struct Robot * robot){
     */
 
     //Rotating Square
-    //Vector rotation to work out corners x2 = x1cos(angle)-y1sin(angle), y2 = x1sin(angle)+y1cos(angle)
+    //Vector rotation to work out corners
+    //x2 = x1cos(angle)-y1sin(angle),
+    //y2 = x1sin(angle)+y1cos(angle)
     robotCentreX = robot->x+ROBOT_WIDTH/2;
     robotCentreY = robot->y+ROBOT_HEIGHT/2;
 
@@ -516,7 +508,41 @@ void robotUpdate(struct SDL_Renderer * renderer, struct Robot * robot){
     }
 }
 
+// default
+void robotMotorMove(struct Robot * robot) {
+    double x_offset, y_offset;
+    switch(robot->direction){
+        case UP :
+            robot->currentSpeed += DEFAULT_SPEED_CHANGE;
+            if (robot->currentSpeed > MAX_ROBOT_SPEED)
+                robot->currentSpeed = MAX_ROBOT_SPEED;
+            break;
+        case DOWN :
+            robot->currentSpeed -= DEFAULT_SPEED_CHANGE;
+            if (robot->currentSpeed < -MAX_ROBOT_SPEED)
+                robot->currentSpeed = -MAX_ROBOT_SPEED;
+            break;
+        case LEFT :
+            robot->angle = (robot->angle+360-DEFAULT_ANGLE_CHANGE)%360;
+            break;
+        case RIGHT :
+            robot->angle = (robot->angle+DEFAULT_ANGLE_CHANGE)%360;
+            break;
+    }
+    robot->direction = 0;
+    x_offset = (-robot->currentSpeed * sin(-robot->angle*PI/180));
+    y_offset = (-robot->currentSpeed * cos(-robot->angle*PI/180));
 
+    robot->true_x += x_offset;
+    robot->true_y += y_offset;
+
+    x_offset = round(robot->true_x);
+    y_offset = round(robot->true_y);
+
+    robot->x = (int) x_offset;
+    robot->y = (int) y_offset;
+}
+/*
 
 // default
 void robotMotorMove(struct Robot * robot) {
@@ -553,7 +579,7 @@ void robotMotorMove(struct Robot * robot) {
     robot->y = (int) y_offset;
 }
 
-/*
+
 // high-performance tyre
 void robotMotorMove(struct Robot * robot) {
     double x_offset, y_offset;
@@ -609,7 +635,7 @@ void robotAutoMotorMove(struct Robot * robot, int front_left_sensor, int front_r
         }
 
         // turn left
-        else if ((robot->currentSpeed > 0) && (left_sensor == 0) && (robot->counter < 30)){
+        else if ((robot->currentSpeed > 0) && (left_sensor == 0) && (robot->counter < (450 / DEFAULT_ANGLE_CHANGE))){
             robot->direction = LEFT;
             /*
             if (robot->currentSpeed > DEFAULT_SPEED_CHANGE_BREAK){
@@ -630,6 +656,7 @@ void robotAutoMotorMove(struct Robot * robot, int front_left_sensor, int front_r
         }
         */
         robot->currentSpeed -= DEFAULT_SPEED_CHANGE;
+        robot->counter = 0;
     }
 
     // wall in front or about to reach dead end, robot moving
@@ -642,10 +669,14 @@ void robotAutoMotorMove(struct Robot * robot, int front_left_sensor, int front_r
     // wall in front, right side open, robot stopped
     else if (((robot->currentSpeed == 0) && (front_left_sensor == 1)) || ((right_sensor == 0) || (front_right_sensor == 0 ) || (left_sensor == 1))){
         robot->direction = RIGHT;
+        robot->counter = 0;
     }
 
-    // dead end, robot stopped
+    // dead end
     else{
-        robot->direction = RIGHT;
+        printf("BREAKING. Speed: %d\n", robot->currentSpeed);
+        robot->direction = DOWN;
+        robot->counter = 0;
+        //robot->direction = RIGHT;
     }
 }
