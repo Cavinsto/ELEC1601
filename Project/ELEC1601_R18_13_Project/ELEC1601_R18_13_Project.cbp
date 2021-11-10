@@ -38,10 +38,14 @@
 			<Add option="-Wall" />
 			<Add directory="../SDL2-2.0.16/x86_64-w64-mingw32/include/SDL2" />
 			<Add directory="../SDL2_gfx-1.0.1" />
+			<Add directory="../SDL2_ttf-2.0.15/x86_64-w64-mingw32/include/SDL2" />
+			<Add directory="../SDL2_image-2.0.5/x86_64-w64-mingw32/include/SDL2" />
 		</Compiler>
 		<Linker>
-			<Add option="-lmingw32 -lSDL2main -lSDL2" />
+			<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image" />
 			<Add directory="../SDL2-2.0.16/x86_64-w64-mingw32/lib" />
+			<Add directory="../SDL2_ttf-2.0.15/x86_64-w64-mingw32/lib" />
+			<Add directory="../SDL2_image-2.0.5/x86_64-w64-mingw32/lib" />
 		</Linker>
 		<Unit filename="formulas.c">
 			<Option compilerVar="CC" />

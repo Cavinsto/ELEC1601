@@ -16,7 +16,7 @@
 
 #define DEFAULT_ANGLE_CHANGE 15
 #define DEFAULT_SPEED_CHANGE 1
-#define DEFAULT_SPEED_CHANGE_BREAK 7
+#define DEFAULT_SPEED_CHANGE_BREAK 5
 #define MAX_ROBOT_SPEED 25
 #define PI 3.14159265
 #define SENSOR_VISION 30
@@ -24,6 +24,7 @@
 struct Wall {
     int x,y;
     int width, height;
+    int counter;
 };
 
 struct Wall_collection {
@@ -41,6 +42,8 @@ struct Robot {
     int width, height;
     int crashed;
     int auto_mode;
+    int counter;
 };
+
 
 #endif // STRUCTURES_H_INCLUDED
