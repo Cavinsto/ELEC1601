@@ -15,70 +15,13 @@
 int done = 0;
 int frame_counter = 0;
 
+SDL_Window *window;
+SDL_Renderer *renderer;
 SDL_Texture *initialize_texture_from_file(const char* file_name, SDL_Renderer *renderer);
 
 int main(int argc, char *argv[]){
 
-    SDL_Window *window;
-    //SDL_Renderer *renderer;
-
-    if(SDL_Init(SDL_INIT_VIDEO) < 0){
-        return 1;
-    }
-
-    window = SDL_CreateWindow("Robot Maze", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, OVERALL_WINDOW_WIDTH, OVERALL_WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
-
-    // Create a renderer (accelerated and in sync with the display refresh rate)
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
-    // Initialize support for loading PNG and JPEG images
-    IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
-    SDL_Texture * image_texture_01 = initialize_texture_from_file("TitleScreen_01.jpg", renderer);
-    //SDL_Texture * image_texture_02 = initialize_texture_from_file("TitleScreen_02.jpg", renderer);
-    int image_width, image_height;
-
-    // Get texture width/height
-    SDL_QueryTexture(image_texture_01, NULL, NULL, &image_width, &image_height);
-    //SDL_QueryTexture(image_texture_02, NULL, NULL, &image_width, &image_height);
-
-    // Define where on the "screen" we want to draw the texture
-    SDL_Rect texture_destination;
-
-    texture_destination.x = 0;
-    texture_destination.y = 0;
-    texture_destination.w = image_width;
-    texture_destination.h = image_height;
-
-    bool running = true;
-    SDL_Event e;
-    while(running)
-    {
-        const Uint8 *state = SDL_GetKeyboardState(NULL);
-        // Process events
-        while(SDL_PollEvent(&e))
-        {
-            if(state[SDL_SCANCODE_RETURN]){
-                running = false;
-            }
-        }
-
-        // Clear screen
-        SDL_RenderClear(renderer);
-
-        // Draw
-        SDL_RenderCopy(renderer, image_texture_01, NULL, &texture_destination);
-
-        // Show what was drawn
-        SDL_RenderPresent(renderer);
-    }
-
-    // Release resources
-    SDL_DestroyTexture(image_texture_01);
-    //SDL_DestroyTexture(image_texture_02);
-    IMG_Quit();
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    callTitleScreen();
 
     window = SDL_CreateWindow("Robot Maze", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, OVERALL_WINDOW_WIDTH, OVERALL_WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
     renderer = SDL_CreateRenderer(window, -1, 0);
@@ -330,10 +273,12 @@ int main(int argc, char *argv[]){
     while(!done){
         SDL_SetRenderDrawColor(renderer, 240, 240, 240, 255);
         SDL_RenderClear(renderer);
+        const Uint8 *state = SDL_GetKeyboardState(NULL);
         //Move robot based on user input commands/auto commands
         if (robot.auto_mode == 1)
             robotAutoMotorMove(&robot, front_left_sensor, front_right_sensor, left_sensor, right_sensor);
         robotMotorMove(&robot);
+        printf("Frame %d\n", frame_counter);
 
         //Check if robot reaches endpoint. and check sensor values
 
@@ -354,7 +299,7 @@ int main(int argc, char *argv[]){
             robotCrash(&robot);
         //Otherwise compute sensor information
         else {
-            printf("Frame %d\n", frame_counter);
+
             front_left_sensor = checkRobotSensorFrontLeftAllWalls(&robot, head);
             if (front_left_sensor>0){
                 printf("Getting close on the FRONT (L). Score = %d\n", front_left_sensor);
@@ -371,11 +316,14 @@ int main(int argc, char *argv[]){
             left_sensor = checkRobotSensorLeftAllWalls(&robot, head);
             if (left_sensor>0){
                 printf("Getting close on the LEFT. Score = %d\n", left_sensor);
-            }
-            printf("--------------------------------------------\n");
-            frame_counter ++;
 
-        }
+            }
+         }
+         printf("--------------------------------------------\n");
+         frame_counter ++;
+
+
+
         robotUpdate(renderer, &robot);
         updateAllWalls(head, renderer);
 
@@ -405,6 +353,13 @@ int main(int argc, char *argv[]){
                 robot.auto_mode = 1;
                 start_time = clock();
             }
+            if(state[SDL_SCANCODE_ESCAPE]){
+                callPauseScreen();
+                window = SDL_CreateWindow("Robot Maze", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, OVERALL_WINDOW_WIDTH, OVERALL_WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
+                renderer = SDL_CreateRenderer(window, -1, 0);
+
+            }
+
         }
 
         SDL_Delay(120);
@@ -413,6 +368,127 @@ int main(int argc, char *argv[]){
     SDL_DestroyWindow(window);
     printf("DEAD\n");
 }
+
+void callTitleScreen(){
+    if(SDL_Init(SDL_INIT_VIDEO) < 0){
+        return 1;
+    }
+
+    window = SDL_CreateWindow("Robot Maze", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, OVERALL_WINDOW_WIDTH, OVERALL_WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
+
+    // Create a renderer (accelerated and in sync with the display refresh rate)
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+    // Initialize support for loading PNG and JPEG images
+    IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
+    SDL_Texture * image_texture = initialize_texture_from_file("TitleScreen.png", renderer);
+    int image_width, image_height;
+
+    // Get texture width/height
+    SDL_QueryTexture(image_texture, NULL, NULL, &image_width, &image_height);
+
+    // Define where on the "screen" we want to draw the texture
+    SDL_Rect texture_destination;
+
+    texture_destination.x = 0;
+    texture_destination.y = 0;
+    texture_destination.w = image_width;
+    texture_destination.h = image_height;
+
+    bool running = true;
+    SDL_Event e;
+    while(running)
+    {
+        const Uint8 *state = SDL_GetKeyboardState(NULL);
+        // Process events
+        while(SDL_PollEvent(&e))
+        {
+            if(state[SDL_SCANCODE_RETURN]){
+                running = false;
+            }
+        }
+        // Clear screen
+        SDL_RenderClear(renderer);
+
+        // Draw
+        SDL_RenderCopy(renderer, image_texture, NULL, &texture_destination);
+
+        // Show what was drawn
+        SDL_RenderPresent(renderer);
+    }
+
+    // Release resources
+    SDL_DestroyTexture(image_texture);
+    IMG_Quit();
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+
+    // Re-render game screen
+    window = SDL_CreateWindow("Robot Maze", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, OVERALL_WINDOW_WIDTH, OVERALL_WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
+    renderer = SDL_CreateRenderer(window, -1, 0);
+}
+
+void callPauseScreen(){
+    if(SDL_Init(SDL_INIT_VIDEO) < 0){
+        return 1;
+    }
+
+    window = SDL_CreateWindow("Robot Maze", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, OVERALL_WINDOW_WIDTH, OVERALL_WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
+
+    // Create a renderer (accelerated and in sync with the display refresh rate)
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+    // Initialize support for loading PNG and JPEG images
+    IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
+    SDL_Texture * image_texture = initialize_texture_from_file("PauseScreen.png", renderer);
+    int image_width, image_height;
+
+    // Get texture width/height
+    SDL_QueryTexture(image_texture, NULL, NULL, &image_width, &image_height);
+
+    // Define where on the "screen" we want to draw the texture
+    SDL_Rect texture_destination;
+
+    texture_destination.x = 0;
+    texture_destination.y = 0;
+    texture_destination.w = image_width;
+    texture_destination.h = image_height;
+
+    bool running = true;
+    SDL_Event e;
+    while(running)
+    {
+        const Uint8 *state = SDL_GetKeyboardState(NULL);
+        // Process events
+        while(SDL_PollEvent(&e))
+        {
+            if(state[SDL_SCANCODE_RETURN]){
+                running = false;
+            }
+        }
+        // Clear screen
+        SDL_RenderClear(renderer);
+
+        // Draw
+        SDL_RenderCopy(renderer, image_texture, NULL, &texture_destination);
+
+        // Show what was drawn
+        SDL_RenderPresent(renderer);
+    }
+
+    // Release resources
+    SDL_DestroyTexture(image_texture);
+    IMG_Quit();
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+
+    // Re-render game screen
+    window = SDL_CreateWindow("Robot Maze", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, OVERALL_WINDOW_WIDTH, OVERALL_WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
+    renderer = SDL_CreateRenderer(window, -1, 0);
+}
+
 
 SDL_Texture *initialize_texture_from_file(const char* file_name, SDL_Renderer *renderer) {
     SDL_Surface *image = IMG_Load(file_name);
